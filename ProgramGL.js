@@ -4,9 +4,8 @@
 
 define(function(){
 
-  var ProgramGL = function(){
-
-
+  var ProgramGL = function(ctx, config){
+    this.ctx = ctx;
 
     this.attributes = {};
     this.uniforms = {};
@@ -17,7 +16,15 @@ define(function(){
     //  Function to be drawn every round
     this.draw = null;
 
+    if(config['vertexShader'] != null){
+      this.setVertexShader(config['vertexShader']);
+    }
 
+    if(config['fragmentShader'] != null){
+      this.setFragmentShader(config['fragmentShader']);
+    }
+
+    return this;
   };
 
   ProgramGL.constructor = ProgramGL;
@@ -26,9 +33,13 @@ define(function(){
     this.draw = funct.bind(this);
   };
 
-  ProgramGL.prototype.setVertexShader = function(shaderText) {};
+  ProgramGL.prototype.setVertexShader = function(vspointer) {
 
-  ProgramGL.prototype.setFragmentShader = function(shaderText) {};
+  };
+
+  ProgramGL.prototype.setFragmentShader = function(fspointer) {
+
+  };
 
   ProgramGL.prototype.execute = function() {
     if(this.enabled == true){

@@ -51,8 +51,6 @@ define(['etc/CanvasGL/ProgramGL'], function(ProgramGL){
     this.prototype.initEventHandlers = funct.bind(this);
   };
 
-
-  
   //  Methods
   CanvasGL.prototype.setWebGLCanvas = function(canvasid){
     this.canvas = document.getElementById(canvasid);
@@ -78,18 +76,37 @@ define(['etc/CanvasGL/ProgramGL'], function(ProgramGL){
     this.ctx.clear(this.ctx.COLOR_BUFFER_BIT);
   };
 
-
   CanvasGL.prototype.execute = function(){
-    for(var i in this.programs){
+    for(var i in this.programs) {
       this.programs[i].execute();
     }
   };
 
   CanvasGL.prototype.createProgram = function(vertexShader, fragmentShader){
-    var p = new ProgramGL();
-    this.programs.push(
-    );
+    this.programs.push(new ProgramGL(this.ctx, {
+      vertexShader : this.createShader(vertexShader, this.ctx.VERTEX_SHADER),
+      fragmentShader : this.createShader(fragmentShader, this.ctx.FRAGMENT_SHADER)
+    }));
   };
+
+  /**
+   * @param src
+   * @param type
+   * @returns {WebGLShader}
+   */
+  CanvasGL.prototype.createShader = function(src, type) {
+    var shader = this.ctx.createShader(type);
+    this.ctx.shaderSource(shader, src);
+    this.ctx.compileShader(shader);
+    if(!this.ctx.getShaderParameter(shader, this.ctx.COMPILE_STATUS)) {
+      console.log(this.ctx.getShaderInfoLog(shader));
+      //throw new Error(this.ctx.getShaderInfoLog(shader));
+    }
+    return shader;
+  };
+
+
+
 
   return CanvasGL;
 

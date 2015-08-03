@@ -15,13 +15,13 @@ define(function(){
     this.attrdata = {
       //  attr : {
       //    data:[data, data, ...],
-      //    dataSize:int
+      //    segsize:int
       //  }
     };
     this.unifdata = {
       //  unif : {
       //    data:[data, data, ...],
-      //    dataSize:int
+      //    segsize:int
       //  }
     };
     this.changed = {
@@ -79,19 +79,20 @@ define(function(){
       this.ctx.useProgram(this.program);
       this._retrieveAttributes();
       this._retrieveUniforms();
-      this._updateData();
-      this._drawData();
-      //this.draw.call(this);
+      this.draw();
     }
   };
 
-  ProgramGL.prototype.updateAttribute = function(attr, data) {
-    this.data[attr] = data;
+  ProgramGL.prototype.updateAttribute = function(attr, data, size) {
+    this.attrdata[attr].data = data;
+    this.attrdata[attr].segsize = size;
     this.changed[attr] = 'attrdata'
   };
-  ProgramGL.prototype.updateUniform = function(attr, data) {
-    this.data[attr] = data;
-    this.changed[attr] = 'unifdata'
+
+  ProgramGL.prototype.updateUniform = function(unif, data, size) {
+    this.unifdata[unif].data = data;
+    this.unifdata[unif].segsize = size;
+    this.changed[unif] = 'unifdata'
   };
 
   /**
@@ -125,7 +126,7 @@ define(function(){
     var numAttributes = this.ctx.getProgramParameter(this.program, this.ctx.ACTIVE_ATTRIBUTES);
     for (var i=0; i<numAttributes; i++) {
       var nameAttrib = this.ctx.getActiveAttrib(this.program, i).name;
-      this.attributes[nameAttrib] = this.ctx.getAttribLocation(program, nameAttrib);
+      this.attributes[nameAttrib] = this.ctx.getAttribLocation(this.program, nameAttrib);
     }
   };
 
@@ -133,7 +134,7 @@ define(function(){
     var numUniforms = this.ctx.getProgramParameter(this.program, this.ctx.ACTIVE_UNIFORMS);
     for (var i=0; i<numUniforms; i++) {
       var nameUniform = this.ctx.getActiveUniform(this.program, i).name;
-      this.uniforms[nameUniform] = this.ctx.getUniformLocation(program, nameUniform);
+      this.uniforms[nameUniform] = this.ctx.getUniformLocation(this.program, nameUniform);
     }
   };
 

@@ -105,6 +105,10 @@ define(['etc/CanvasGL/ProgramGL'], function(ProgramGL){
     return shader;
   };
 
+  CanvasGL.prototype.getShaderFromScript = function(){
+
+  };
+
 
 
 

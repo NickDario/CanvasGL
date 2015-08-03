@@ -33,11 +33,11 @@ define(function(){
     //  Function to be drawn every round
 
     if(config['vertexShader'] != null){
-      this.setVertexShader(config['vertexShader']);
+      this.vertexShader = config['vertexShader'];
     }
 
     if(config['fragmentShader'] != null){
-      this.setFragmentShader(config['fragmentShader']);
+      this.fragmentShader = config['fragmentShader'];
     }
 
     if(this.vertexShader != null && this.fragmentShader != null) {
@@ -75,10 +75,11 @@ define(function(){
   };
 
   ProgramGL.prototype.execute = function() {
-    if(this.enabled == true && this.draw != null){
+    if(this.enabled == true){
       this.ctx.useProgram(this.program);
       this._retrieveAttributes();
       this._retrieveUniforms();
+      this._updateData();
       this._drawData();
       //this.draw.call(this);
     }
@@ -94,23 +95,28 @@ define(function(){
   };
 
   /**
-   * Draw all updated data points
-   *
    * @private
+   * When attribute and uniform data is changed
+   * We push new data into their buffers.
    */
-  ProgramGL.prototype._drawData = function() {
+  ProgramGL.prototype._updateData = function() {
     for(var attr in this.changed) {
       var type = this.changed[attr];
       var data = new Float32Array(this[type][attr].data);
       var dataSize = this[type][attr].dataSize;
-      var bpe = data.BYTES_PER_ELEMENT;
+      //var bpe = data.BYTES_PER_ELEMENT;
 
       var buffer = this.ctx.createBuffer();
       this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, buffer);
       this.ctx.bufferData(this.ctx.ARRAY_BUFFER, data, this.ctx.STATIC_DRAW);
-      this.ctx.vertexAttribPointer(this.attributes[attr], bpe, this.ctx.FLOAT, false, 0, 0);
+      this.ctx.vertexAttribPointer(this.attributes[attr], dataSize, this.ctx.FLOAT, false, 0, 0);
       this.ctx.enableVertexAttribArray(this.attributes[attr]);
       this.changed.splice(attr, 1);
+    }
+  };
+
+  ProgramGL.prototype._drawData = function() {
+    for(var attr in this.attributes){
       this.ctx.drawArrays(this.drawType, 0, data.length / dataSize);
     }
   };
@@ -130,9 +136,6 @@ define(function(){
       this.uniforms[nameUniform] = this.ctx.getUniformLocation(program, nameUniform);
     }
   };
-
-
-
 
   return ProgramGL;
 });

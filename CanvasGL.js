@@ -82,10 +82,11 @@ define(['etc/CanvasGL/ProgramGL'], function(ProgramGL){
     }
   };
 
-  CanvasGL.prototype.createProgram = function(vertexShader, fragmentShader){
+  CanvasGL.prototype.createProgram = function(vertexShader, fragmentShader, drawFunction){
     this.programs.push(new ProgramGL(this.ctx, {
       vertexShader : this.createShader(vertexShader, this.ctx.VERTEX_SHADER),
-      fragmentShader : this.createShader(fragmentShader, this.ctx.FRAGMENT_SHADER)
+      fragmentShader : this.createShader(fragmentShader, this.ctx.FRAGMENT_SHADER),
+      drawFunction : drawFunction
     }));
   };
 
@@ -105,8 +106,28 @@ define(['etc/CanvasGL/ProgramGL'], function(ProgramGL){
     return shader;
   };
 
-  CanvasGL.prototype.getShaderFromScript = function(){
+  CanvasGL.prototype.createShaderFromScript = function(script_id){
+    var script = document.getElementById(script_id);
+    if (!script) {
+      return null;
+    }
+    var source = "";
+    var child = script.firstChild;
 
+    while (child) {
+      if (child.nodeType == child.TEXT_NODE) {
+        source += child.textContent;
+      }
+      child = child.nextSibling;
+    }
+
+    if (script.type == "x-shader/x-fragment") {
+      return this.createShader(source, this.ctx.FRAGMENT_SHADER);
+    } else if (script.type == "x-shader/x-vertex") {
+      return this.createShader(source, this.ctx.VERTEX_SHADER);
+    }
+
+    return null;
   };
 
 

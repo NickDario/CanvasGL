@@ -2,7 +2,7 @@
  * Created by ndario on 8/1/15.
  */
 
-define(function(){
+define(['etc/Sylvestor'], function(){
 
   var ProgramGL = function(ctx, config){
     this.ctx = ctx;
@@ -14,12 +14,18 @@ define(function(){
     this.uniforms = {};
     this.enabled = true;
 
+    this.data = {}; //  for draw
+
     if(config['vertexShader'] != null){
       this.vertexShader = config['vertexShader'];
     }
 
     if(config['fragmentShader'] != null){
       this.fragmentShader = config['fragmentShader'];
+    }
+
+    if(config['drawFunction'] != null) {
+      this.setDrawFunction(config['drawFunction']);
     }
 
     if(this.vertexShader != null && this.fragmentShader != null) {
@@ -70,6 +76,19 @@ define(function(){
     for (var i=0; i<numUniforms; i++) {
       var nameUniform = this.ctx.getActiveUniform(this.program, i).name;
       this.uniforms[nameUniform] = this.ctx.getUniformLocation(this.program, nameUniform);
+    }
+  };
+
+  /**
+   * use this function to update attributes for the draw function
+   */
+  ProgramGL.prototype.updateData = function(attr, val){
+    this.data[attr] = val;
+  };
+
+  ProgramGL.prototype.updateProgram = function(data){
+    for( var i in data){
+      this.data[i] = data[i];
     }
   };
 
